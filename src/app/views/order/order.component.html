@@ -1,0 +1,88 @@
+<mat-tab-group (selectedTabChange)="handleTabChange($event)">
+    <mat-tab label="Dólar" id="dollar"> 
+        <table mat-table [dataSource]="data.dollar.bills" class="mat-elevation-z8">
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef> Célula/Face </th>
+              <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+            </ng-container>
+            <ng-container matColumnDef="qtd">
+              <th mat-header-cell *matHeaderCellDef> QTD </th>
+              <td mat-cell *matCellDef="let element; let index = index;"> 
+                <input type="number" [value]="element.qtd" (input)="updateValue($event, index)">
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef> Total </th>
+              <td mat-cell *matCellDef="let element"> {{element.total}} </td>
+            </ng-container>
+            <ng-container matColumnDef="total_value">
+              <th mat-header-cell *matHeaderCellDef> Total R$ </th>
+              <td mat-cell *matCellDef="let element"> {{element.total_value}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <p>{{data.dollar.total}}</p>
+        <p>{{data.dollar.total_value}}</p>
+    </mat-tab>
+    <mat-tab label="Euro" id="euro">
+        <table mat-table [dataSource]="data.euro.bills" class="mat-elevation-z8">
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef> Célula/Face </th>
+              <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+            </ng-container>
+            <ng-container matColumnDef="qtd">
+              <th mat-header-cell *matHeaderCellDef> QTD </th>
+              <td mat-cell *matCellDef="let element; let index = index;"> 
+                <input type="number" [value]="element.qtd" (input)="updateValue($event, index)">
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef> Total </th>
+              <td mat-cell *matCellDef="let element"> {{element.total}} </td>
+            </ng-container>
+            <ng-container matColumnDef="total_value">
+              <th mat-header-cell *matHeaderCellDef> Total R$ </th>
+              <td mat-cell *matCellDef="let element"> {{element.total_value}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <p>{{data.euro.total}}</p>
+        <p>{{data.euro.total_value}}</p>
+    </mat-tab>
+    <mat-tab label="Libras" id="libra">
+        <table mat-table [dataSource]="data.libra.bills" class="mat-elevation-z8">
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef> Célula/Face </th>
+              <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+            </ng-container>
+            <ng-container matColumnDef="qtd">
+              <th mat-header-cell *matHeaderCellDef> QTD </th>
+              <td mat-cell *matCellDef="let element; let index = index;"> 
+                <input type="number" [value]="element.qtd" (input)="updateValue($event, index)">
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef> Total </th>
+              <td mat-cell *matCellDef="let element"> {{element.total}} </td>
+            </ng-container>
+            <ng-container matColumnDef="total_value">
+              <th mat-header-cell *matHeaderCellDef> Total R$ </th>
+              <td mat-cell *matCellDef="let element"> {{element.total_value}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <p>{{data.libra.total}}</p>
+        <p>{{data.libra.total_value}}</p>
+    </mat-tab>
+</mat-tab-group>
+<p>{{data.total}}</p>
+<p>{{data.total_value}}</p>
+<input type="text" [(ngModel)]="data.user.name">
+<input type="text" [(ngModel)]="data.user.email">
+<input type="text" [(ngModel)]="data.user.document">
+<input type="text" [(ngModel)]="data.user.phone">
+
+<button (click)="submitOrder()">Revisar pedido</button>
