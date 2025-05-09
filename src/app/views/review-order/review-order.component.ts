@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
-import { Order, STORAGE_KEY } from '../order/order.component';
+import { Component, inject } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { Order } from '../../@types';
+import { OrderService } from '../../services/order.service';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-review-order',
@@ -14,11 +16,14 @@ import { MatButtonModule } from '@angular/material/button';
     FormsModule,
     RouterLink,
     MatButtonModule,
+    CurrencyPipe,
   ],
   templateUrl: './review-order.component.html',
   styleUrl: './review-order.component.css',
 })
 export class ReviewOrderComponent {
+  private orderService: OrderService = inject(OrderService);
+
   constructor(private router: Router) {}
 
   displayedColumns: string[] = [
@@ -29,17 +34,7 @@ export class ReviewOrderComponent {
     'total_value',
   ];
   loading = true;
-  order: Order = {
-    list: [],
-    user: {
-      name: '',
-      document: '',
-      email: '',
-      phone: '',
-    },
-    total: 0,
-    total_value: 0,
-  };
+  public order = OrderService.emptyOrder;
 
   ngOnInit() {
     this.loading = true;
@@ -48,11 +43,7 @@ export class ReviewOrderComponent {
 
   getOrder() {
     try {
-      const savedOrder = localStorage.getItem(STORAGE_KEY);
-      const orderJson = JSON.parse(savedOrder as string).order;
-      if (orderJson) {
-        this.order = orderJson;
-      }
+      this.order = this.orderService.getOrder();
     } catch (error) {
       alert('Erro ao processar informações');
       console.error(error);
@@ -62,7 +53,7 @@ export class ReviewOrderComponent {
   }
 
   submitOrder() {
-    localStorage.removeItem(STORAGE_KEY);
+    this.orderService.clearOrder();
     alert('Pedido realizado com sucesso');
     this.router.navigate(['/']);
   }

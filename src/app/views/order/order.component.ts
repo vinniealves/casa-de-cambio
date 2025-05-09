@@ -1,204 +1,42 @@
-import { Component } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
-
-type User = {
-  name: string;
-  document: string;
-  email: string;
-  phone: string;
-};
-
-enum Currencys {
-  dollar = 'dollar',
-  euro = 'euro',
-  libra = 'libra',
-}
-
-type Currency = keyof typeof Currencys;
-
-export type Data = {
-  dollar: CurrencyData;
-  euro: CurrencyData;
-  libra: CurrencyData;
-  total: number;
-  total_value: number;
-  user: User;
-};
-
-export type CurrencyData = {
-  bills: Bill[];
-  total: number;
-  total_value: number;
-};
-
-export type Bill = {
-  currency_name?: string;
-  value: number;
-  qtd: number;
-  total: number;
-  total_value: number;
-};
-
-export type Order = {
-  list: Bill[];
-  user: User;
-  total: number;
-  total_value: number;
-};
-
-export const STORAGE_KEY = 'CASA_DE_CAMBIO';
+import { NgxMaskDirective } from 'ngx-mask';
+import { Currency } from '../../@types';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-order',
-  imports: [MatTabsModule, MatTableModule, FormsModule],
+  imports: [
+    MatTabsModule,
+    MatTableModule,
+    FormsModule,
+    CurrencyPipe,
+    NgxMaskDirective,
+  ],
   templateUrl: './order.component.html',
   styleUrl: './order.component.css',
 })
 export class OrderComponent {
-  constructor(public router: Router) {}
+  private orderService: OrderService = inject(OrderService);
+  public data: Currency[] = [];
+  public loading: boolean = false;
+  public displayedColumns: string[] = ['value', 'qtd', 'total', 'total_value'];
+  public order = OrderService.emptyOrder;
 
-  loading: boolean = false;
-  displayedColumns: string[] = ['value', 'qtd', 'total', 'total_value'];
-
-  data: Data = {
-    dollar: {
-      bills: [
-        {
-          value: 5,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 10,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 20,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 50,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 100,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-      ],
-      total: 0,
-      total_value: 0,
-    },
-    euro: {
-      bills: [
-        {
-          value: 5,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 10,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 20,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 50,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 100,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-      ],
-      total: 0,
-      total_value: 0,
-    },
-    libra: {
-      bills: [
-        {
-          value: 5,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 10,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 20,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 50,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-        {
-          value: 100,
-          qtd: 0,
-          total: 0,
-          total_value: 0,
-        },
-      ],
-      total: 0,
-      total_value: 0,
-    },
-    total: 0,
-    total_value: 0,
-    user: {
-      name: '',
-      document: '',
-      email: '',
-      phone: '',
-    },
-  };
-
-  currency = {
-    value: 6.1,
-    name: Currencys.dollar,
-  };
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.loading = true;
     this.getData();
   }
 
-  getData() {
+  async getData() {
     try {
-      const savedData = localStorage.getItem(STORAGE_KEY);
-      const dataJson = JSON.parse(savedData as string);
-      if (dataJson?.data) {
-        this.data = dataJson.data;
-      }
+      this.data = await this.orderService.getCurrencies();
     } catch (error) {
       alert('Ocorreu um erro ao carregar informações');
       console.error(error);
@@ -207,71 +45,40 @@ export class OrderComponent {
     }
   }
 
-  updateValue(event: Event, index: number) {
+  updateValue(event: Event, dataIndex: number, faceIndex: number) {
     const target = event.target as HTMLInputElement;
     const value = Number(target.value);
 
-    this.data[this.currency.name].bills[index].qtd = value;
-    this.data[this.currency.name].bills[index].total = Number(
-      (value * this.data[this.currency.name].bills[index].value).toFixed(2)
+    const orderConfigArr = this.data[dataIndex].order_config;
+    const orderConfig = this.data[dataIndex].order_config[faceIndex];
+    const dataConfig = this.data[dataIndex];
+
+    orderConfig.currency_name = dataConfig.nome;
+    orderConfig.currency_id = dataConfig.id;
+    orderConfig.qtd = value;
+    orderConfig.total = Number((value * orderConfig.value).toFixed(2));
+    orderConfig.total_value = Number(
+      (value * dataConfig.cotacao * orderConfig.value).toFixed(2)
     );
-    this.data[this.currency.name].bills[index].total_value = Number(
-      (value * this.currency.value).toFixed(2)
+
+    this.data[dataIndex].order_config[faceIndex] = orderConfig;
+
+    this.order.total = orderConfigArr.reduce(
+      (prev, curr) => prev + curr.total,
+      this.order.total
     );
-
-    this.data[this.currency.name] = {
-      ...this.data[this.currency.name],
-      total: Number(
-        this.data[this.currency.name].bills
-          .reduce((prev: number, curr: Bill) => prev + curr.total, 0)
-          .toFixed(2)
-      ),
-      total_value: Number(
-        this.data[this.currency.name].bills
-          .reduce((prev: number, curr: Bill) => prev + curr.total_value, 0)
-          .toFixed(2)
-      ),
-    };
-
-    this.data.total =
-      this.data.dollar.total + this.data.euro.total + this.data.libra.total;
-
-    this.data.total_value =
-      this.data.dollar.total_value +
-      this.data.euro.total_value +
-      this.data.libra.total_value;
+    this.order.total_value = orderConfigArr.reduce(
+      (prev, curr) => prev + curr.total_value,
+      this.order.total_value
+    );
   }
 
-  handleTabChange(value: any) {
-    this.currency.name = value.tab.id;
-  }
-
-  submitOrder() {
-    const order: Order = {
-      list: [
-        ...this.data.dollar.bills
-          .filter((elem: Bill) => elem.qtd)
-          .map((elem: Bill) => ({ ...elem, currency_name: 'Dólar' })),
-        ...this.data.euro.bills
-          .filter((elem: Bill) => elem.qtd)
-          .map((elem: Bill) => ({ ...elem, currency_name: 'Euro' })),
-        ...this.data.libra.bills
-          .filter((elem: Bill) => elem.qtd)
-          .map((elem: Bill) => ({ ...elem, currency_name: 'Libra' })),
-      ],
-      user: this.data.user,
-      total: this.data.total,
-      total_value: this.data.total_value,
-    };
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        order: order,
-        data: this.data,
-      })
-    );
-
+  saveOrder() {
+    if (this.order.total_value < 100) {
+      alert('O pedido precisa ter um valor de no mínimo R$100,00');
+      return;
+    }
+    this.orderService.saveOrder(this.data, this.order);
     this.router.navigate(['/revisar-pedido']);
   }
 }
