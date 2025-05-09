@@ -27,7 +27,6 @@ import { OrderService } from '../../services/order.service';
     MatTableModule,
     FormsModule,
     CurrencyPipe,
-    NgxMaskDirective,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -35,6 +34,7 @@ import { OrderService } from '../../services/order.service';
     MatProgressSpinnerModule,
     MatGridListModule,
     ReactiveFormsModule,
+    NgxMaskDirective,
   ],
   templateUrl: './order.component.html',
   styleUrl: './order.component.css',
@@ -74,7 +74,6 @@ export class OrderComponent {
       if (order?.user) {
         this.form.patchValue(order.user);
       }
-      console.log(this.form);
     } catch (error) {
       console.error(error);
     } finally {

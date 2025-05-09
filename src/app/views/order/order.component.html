@@ -36,13 +36,13 @@
             <ng-container matColumnDef="total">
               <th mat-header-cell *matHeaderCellDef>Total</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.total.toFixed(2) }}
+                {{ element.total | currency : "" : "" }}
               </td>
             </ng-container>
             <ng-container matColumnDef="total_value">
               <th mat-header-cell *matHeaderCellDef>Total R$</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.total_value | currency : "BRL" }}
+                {{ element.total_value | currency }}
               </td>
             </ng-container>
 
@@ -50,7 +50,7 @@
             <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </table>
           <p>{{ item.total }}</p>
-          <p>{{ item.total_value | currency : "BRL" }}</p>
+          <p>{{ item.total_value | currency }}</p>
         </mat-tab>
 
         }
@@ -58,8 +58,8 @@
 
       <div class="total-container">
         <p>Total</p>
-        <p>{{ order.total.toFixed(2) }}</p>
-        <p>{{ order.total_value | currency : "BRL" }}</p>
+        <p>{{ order.total | currency : "" : "" }}</p>
+        <p>{{ order.total_value | currency }}</p>
       </div>
 
       <div class="form-container" [formGroup]="form">
