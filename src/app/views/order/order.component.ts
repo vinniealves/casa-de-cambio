@@ -1,11 +1,23 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Router } from '@angular/router';
 import { NgxMaskDirective } from 'ngx-mask';
-import { Currency } from '../../@types';
+import Swal from 'sweetalert2';
+import { Currency, User } from '../../@types';
 import { OrderService } from '../../services/order.service';
 
 @Component({
@@ -16,6 +28,13 @@ import { OrderService } from '../../services/order.service';
     FormsModule,
     CurrencyPipe,
     NgxMaskDirective,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatGridListModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './order.component.html',
   styleUrl: './order.component.css',
@@ -26,19 +45,37 @@ export class OrderComponent {
   public loading: boolean = false;
   public displayedColumns: string[] = ['value', 'qtd', 'total', 'total_value'];
   public order = OrderService.emptyOrder;
+  private formBuilder = inject(FormBuilder);
+
+  public form = this.formBuilder.group({
+    name: ['', Validators.required],
+    email: ['', Validators.compose([Validators.required, Validators.email])],
+    document: [
+      '',
+      Validators.compose([Validators.required, Validators.minLength(11)]),
+    ],
+    phone: [
+      '',
+      Validators.compose([Validators.required, Validators.minLength(11)]),
+    ],
+  });
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.loading = true;
     this.getData();
   }
 
   async getData() {
     try {
+      this.loading = true;
       this.data = await this.orderService.getCurrencies();
+      const order = await this.orderService.getOrder();
+      if (order?.user) {
+        this.form.patchValue(order.user);
+      }
+      console.log(this.form);
     } catch (error) {
-      alert('Ocorreu um erro ao carregar informações');
       console.error(error);
     } finally {
       this.loading = false;
@@ -63,21 +100,32 @@ export class OrderComponent {
 
     this.data[dataIndex].order_config[faceIndex] = orderConfig;
 
-    this.order.total = orderConfigArr.reduce(
-      (prev, curr) => prev + curr.total,
-      this.order.total
-    );
-    this.order.total_value = orderConfigArr.reduce(
-      (prev, curr) => prev + curr.total_value,
-      this.order.total_value
-    );
+    let total = [];
+    let total_value = [];
+    for (let item of this.data) {
+      total.push(
+        item.order_config.reduce((prev, curr) => prev + curr.total, 0)
+      );
+      total_value.push(
+        item.order_config.reduce((prev, curr) => prev + curr.total_value, 0)
+      );
+    }
+
+    this.order.total = total.reduce((prev, curr) => prev + curr);
+    this.order.total_value = total_value.reduce((prev, curr) => prev + curr);
   }
 
   saveOrder() {
     if (this.order.total_value < 100) {
-      alert('O pedido precisa ter um valor de no mínimo R$100,00');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Atenção',
+        text: 'O valor mínimo do pedido é de R$100,00',
+      });
+
       return;
     }
+    this.order.user = this.form.value as User;
     this.orderService.saveOrder(this.data, this.order);
     this.router.navigate(['/revisar-pedido']);
   }

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { Currency, Order } from '../@types';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -9,7 +9,7 @@ export class OrderService {
     'https://qugkx0grkb.execute-api.sa-east-1.amazonaws.com/api/moedas';
 
   readonly storageKey = 'CASA_DE_CAMBIO';
-
+  private http = inject(HttpClient);
   static emptyOrder: Order = {
     list: [],
     user: {
@@ -61,7 +61,7 @@ export class OrderService {
     }
   }
 
-  saveOrder(data: Currency[], order: Omit<Order, 'list'>) {
+  saveOrder(data: Currency[], order: Order) {
     const list = [];
 
     for (let item of data) {
@@ -92,7 +92,8 @@ export class OrderService {
 
   getOrder() {
     const savedOrder = localStorage.getItem(this.storageKey);
-    const orderJson = JSON.parse(savedOrder as string).order;
+    const orderJson = JSON.parse(savedOrder as string)?.order;
     if (orderJson) return orderJson;
+    return Promise.resolve(OrderService.emptyOrder);
   }
 }

@@ -5,7 +5,7 @@ export type User = {
   phone: string;
 };
 
-type CurrencyResponse = {
+export type CurrencyResponse = {
   id: string;
   cotacao: number;
   faces: number[];

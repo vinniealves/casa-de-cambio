@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ReviewOrderComponent } from './review-order.component';
+import { RouterModule } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('ReviewOrderComponent', () => {
   let component: ReviewOrderComponent;
@@ -8,9 +11,9 @@ describe('ReviewOrderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReviewOrderComponent]
-    })
-    .compileComponents();
+      imports: [ReviewOrderComponent, RouterModule.forRoot([])],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewOrderComponent);
     component = fixture.componentInstance;
