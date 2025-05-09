@@ -23,18 +23,17 @@ import { CurrencyPipe } from '@angular/common';
 })
 export class ReviewOrderComponent {
   private orderService: OrderService = inject(OrderService);
-
-  constructor(private router: Router) {}
-
-  displayedColumns: string[] = [
+  public displayedColumns: string[] = [
     'currency_name',
     'value',
     'qtd',
     'total',
     'total_value',
   ];
-  loading = true;
+  public loading = true;
   public order = OrderService.emptyOrder;
+
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.loading = true;

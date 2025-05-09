@@ -5,11 +5,14 @@ export type User = {
   phone: string;
 };
 
-export type Currency = {
+type CurrencyResponse = {
   id: string;
   cotacao: number;
   faces: number[];
   nome: string;
+};
+
+export type Currency = CurrencyResponse & {
   order_config: OrderConfig[];
   total: number;
   total_value: number;
