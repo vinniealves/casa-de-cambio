@@ -20,4 +20,8 @@ describe('HomeComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should contain a title with the name “Casa de câmbio”', () => {});
+  it('should contain a logo image', () => {});
+  it('should contain a button that redirects to the order page', () => {});
 });
