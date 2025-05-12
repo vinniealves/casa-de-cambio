@@ -28,9 +28,4 @@ describe('OrderComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  it('should allow the user to switch between currencies and edit the amount of bills you want for each face', () => {});
-  it('should update totals after quantity is changed', () => {});
-  it('should have a minimum value of R$100 to complete the order', () => {});
-  it('it should provide user data: name, email, document and phone', () => {});
 });

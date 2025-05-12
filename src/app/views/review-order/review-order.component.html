@@ -43,6 +43,7 @@
         <p>{{ order.total_value | currency }}</p>
       </div>
 
+      @if (order.user) {
       <div class="form-container">
         <mat-form-field class="input-container">
           <mat-label>Nome</mat-label>
@@ -87,6 +88,7 @@
           />
         </mat-form-field>
       </div>
+      }
 
       <div class="button-container">
         <a mat-raised-button routerLink="/pedido">Voltar</a>
