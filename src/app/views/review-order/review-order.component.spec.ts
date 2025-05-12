@@ -25,10 +25,7 @@ describe('ReviewOrderComponent', () => {
   });
 
   it('should list a single table for all coins, non-editable, sorted by coin and face, with only the faces that had a quantity greater than or equal to 1', () => {});
-
   it('should display the personal data provided', () => {});
-
   it('should display a button that returns to the order page with the data provided', () => {});
-
   it('should display a button "Finalizar pedido" that display a success message and then returns to home page', () => {});
 });
